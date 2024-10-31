@@ -1,0 +1,32 @@
+### Get all reservations
+GET http://localhost:3000/reservations
+
+
+### Create a reservation
+POST http://localhost:3000/reservations
+Content-Type: application/json
+
+{
+  "startDate": "2021-01-01",
+  "endDate": "2021-01-02",
+  "placeId": "1234",
+  "invoiceId": "5678"
+}
+
+### Get a reservation by id
+GET http://localhost:3000/reservations/6723b31e26bce79c19d15ddb
+
+### Update a reservation by id
+PATCH  http://localhost:3000/reservations/6723b31e26bce79c19d15ddb
+Content-Type: application/json
+
+{
+  "startDate": "2024-01-01",
+  "endDate": "2026-01-02",
+  "placeId": "4532",
+  "invoiceId": "541"
+}
+
+### Delete a reservation by id
+DELETE http://localhost:3000/reservations/6723b61326bce79c19d15ded
+

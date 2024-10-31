@@ -1,0 +1,514 @@
+{
+	"info": {
+		"_postman_id": "592a4280-726d-4f0a-a410-fb049ff46c9d",
+		"name": "Reservation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26596315",
+		"_collection_link": "https://cloudy-eclipse-51657.postman.co/workspace/SLEEPR-API-Microservice-Monorep~80f28be4-367a-4abe-88a0-ab67314636be/collection/26596315-592a4280-726d-4f0a-a410-fb049ff46c9d?action=share&source=collection_link&creator=26596315"
+	},
+	"item": [
+		{
+			"name": "Get all reservations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/reservations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"reservations"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/reservations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "201"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"c9-oyMm7TDuV0h21y+gqmOhID64LKU\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Oct 2024 16:55:24 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"_id\": \"6723b61326bce79c19d15ded\",\n        \"timestamp\": \"2024-10-31T16:53:39.686Z\",\n        \"startDate\": \"2021-01-01T00:00:00.000Z\",\n        \"endDate\": \"2021-01-02T00:00:00.000Z\",\n        \"userId\": \"1\",\n        \"placeId\": \"45322\",\n        \"invoiceId\": \"5412\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Create a reservation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"}); \r",
+							"\r",
+							"// Test: Ensure required fields are present in response\r",
+							"pm.response.code ===201 && pm.test(\"Response contains required fields\", function () {\r",
+							"    pm.expect(jsonData).to.have.property(\"_id\");\r",
+							"    pm.expect(jsonData).to.have.property(\"timestamp\");\r",
+							"    pm.expect(jsonData).to.have.property(\"startDate\");\r",
+							"    pm.expect(jsonData).to.have.property(\"endDate\");\r",
+							"    pm.expect(jsonData).to.have.property(\"userId\");\r",
+							"    pm.expect(jsonData).to.have.property(\"placeId\");\r",
+							"    pm.expect(jsonData).to.have.property(\"invoiceId\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.environment.set(\"reservationID\", jsonData._id);\r",
+							"pm.environment.set(\"userId\", jsonData.userId);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"startDate\": \"2021-01-01\",\r\n  \"endDate\": \"2021-01-02\",\r\n  \"placeId\": \"1234\",\r\n  \"invoiceId\": \"5678\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/reservations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"reservations"
+					]
+				},
+				"description": "### Create Reservation\n\nThis endpoint allows you to create a new reservation.\n\n#### Request Body\n\n- startDate (string): The start date of the reservation.\n    \n- endDate (string): The end date of the reservation.\n    \n- placeId (string): The ID of the place for the reservation.\n    \n- invoiceId (string): The ID of the invoice for the reservation.\n    \n\n#### Response\n\nThe response for this request can be represented as a JSON schema:\n\n``` json\n{\n  \"_id\": \"\",\n  \"timestamp\": \"\",\n  \"startDate\": \"\",\n  \"endDate\": \"\",\n  \"userId\": \"\",\n  \"placeId\": \"\",\n  \"invoiceId\": \"\"\n}\n\n ```"
+			},
+			"response": [
+				{
+					"name": "201 Create",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"startDate\": \"2021-01-01\",\r\n  \"endDate\": \"2021-01-02\",\r\n  \"placeId\": \"1234\",\r\n  \"invoiceId\": \"5678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/reservations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "198"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"c6-ZD7m4K1uYTaO+Vn8QY3YH5iterg\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Oct 2024 16:53:39 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_id\": \"6723b61326bce79c19d15ded\",\n    \"timestamp\": \"2024-10-31T16:53:39.686Z\",\n    \"startDate\": \"2021-01-01T00:00:00.000Z\",\n    \"endDate\": \"2021-01-02T00:00:00.000Z\",\n    \"userId\": \"1\",\n    \"placeId\": \"1234\",\n    \"invoiceId\": \"5678\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Get a reservation by id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/reservations/{{reservationID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"reservations",
+						"{{reservationID}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/reservations/6723b61326bce79c19d15ded",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations",
+								"6723b61326bce79c19d15ded"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "199"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"c7-8VSL5OPzHcZy5sV7FC6gWDgtkjw\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Oct 2024 16:56:26 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_id\": \"6723b61326bce79c19d15ded\",\n    \"timestamp\": \"2024-10-31T16:53:39.686Z\",\n    \"startDate\": \"2021-01-01T00:00:00.000Z\",\n    \"endDate\": \"2021-01-02T00:00:00.000Z\",\n    \"userId\": \"1\",\n    \"placeId\": \"45322\",\n    \"invoiceId\": \"5412\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Update a reservation by id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\r\n  \"placeId\": \"45322\",\r\n  \"invoiceId\": \"5412\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/reservations/{{reservationID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"reservations",
+						"{{reservationID}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n  \"placeId\": \"45322\",\r\n  \"invoiceId\": \"5412\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/reservations/6723b61326bce79c19d15ded",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations",
+								"6723b61326bce79c19d15ded"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "199"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"c7-8VSL5OPzHcZy5sV7FC6gWDgtkjw\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Oct 2024 16:55:06 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_id\": \"6723b61326bce79c19d15ded\",\n    \"timestamp\": \"2024-10-31T16:53:39.686Z\",\n    \"startDate\": \"2021-01-01T00:00:00.000Z\",\n    \"endDate\": \"2021-01-02T00:00:00.000Z\",\n    \"userId\": \"1\",\n    \"placeId\": \"45322\",\n    \"invoiceId\": \"5412\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Delete a reservation by id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/reservations/{{reservationID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"reservations",
+						"{{reservationID}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 Delete",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/reservations/6723b61326bce79c19d15ded",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations",
+								"6723b61326bce79c19d15ded"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "199"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"c7-8VSL5OPzHcZy5sV7FC6gWDgtkjw\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 31 Oct 2024 16:57:34 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_id\": \"6723b61326bce79c19d15ded\",\n    \"timestamp\": \"2024-10-31T16:53:39.686Z\",\n    \"startDate\": \"2021-01-01T00:00:00.000Z\",\n    \"endDate\": \"2021-01-02T00:00:00.000Z\",\n    \"userId\": \"1\",\n    \"placeId\": \"45322\",\n    \"invoiceId\": \"5412\"\n}"
+				}
+			]
+		}
+	]
+}

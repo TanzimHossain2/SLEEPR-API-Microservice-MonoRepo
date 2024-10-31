@@ -1,4 +1,4 @@
-# SLEEPR API Microservice
+# SLEEPR API Microservice Monorepo
 
 ## Overview
 
@@ -7,6 +7,7 @@ The SLEEPR API Microservice is a scalable microservices-based backend for the **
 ## Architecture Diagram
 
 ![Sleepr Diagram](./diagram/sleepr.webp)
+
 
 ### Services and Responsibilities
 
@@ -42,7 +43,6 @@ The SLEEPR API Microservice is a scalable microservices-based backend for the **
 - **MongoDB** as the main data store.
 - **Stripe** for handling payments.
 - **Gmail** for notification services.
-
 
 ## Getting Started
 
@@ -92,20 +92,14 @@ $ pnpm run start:prod
 
 A Docker Compose file can be added to facilitate running all services and dependencies like MongoDB in containers. This allows for seamless integration and scalable deployment.
 
-## Testing
 
-The project includes testing scripts for unit, end-to-end (e2e), and coverage testing.
+## API Documentation
 
-```bash
-# Unit tests
-$ pnpm run test
+The API documentation is automatically generated using Swagger. You can access it by navigating to the following URL in your browser:
 
-# End-to-end tests
-$ pnpm run test:e2e
+[API Documentation](http://localhost:3000/api-docs)
+http://localhost:3000/api-docs
 
-# Coverage report
-$ pnpm run test:cov
-```
 
 ## API Endpoints
 
