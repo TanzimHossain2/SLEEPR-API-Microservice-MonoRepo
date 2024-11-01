@@ -1,0 +1,20 @@
+services:
+  reservations:
+    build:
+      context: .
+      dockerfile: ./apps/reservations/Dockerfile
+      target: development
+    # command: sh -c "pnpm install && pnpm run start:dev"
+    command: pnpm run start:dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      NODE_ENV: development
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - '27017:27017'

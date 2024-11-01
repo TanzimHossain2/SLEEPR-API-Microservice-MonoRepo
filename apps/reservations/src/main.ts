@@ -12,6 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(ReservationsModule);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useLogger(app.get(Logger));
+  console.log('test');
 
   const swaggerFilePath = path.resolve(__dirname, '../../../swagger.yaml');
   const swaggerFile = fs.readFileSync(swaggerFilePath, 'utf8');
