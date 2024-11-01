@@ -1,17 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { ReservationsModule } from './reservations.module';
 
+import { ValidationPipe } from '@nestjs/common';
 import * as fs from 'fs';
+import { Logger } from 'nestjs-pino';
 import * as path from 'path';
 import * as swaggerUi from 'swagger-ui-express';
 import * as yaml from 'yaml';
-import { ValidationPipe } from '@nestjs/common';
-import { Logger } from 'nestjs-pino'; 
-
 
 async function bootstrap() {
   const app = await NestFactory.create(ReservationsModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useLogger(app.get(Logger));
 
   const swaggerFilePath = path.resolve(__dirname, '../../../swagger.yaml');

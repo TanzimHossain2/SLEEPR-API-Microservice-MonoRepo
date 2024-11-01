@@ -3,20 +3,24 @@ info:
   title: Reservations API
   version: '1.0'
 servers:
-- url: http://localhost:3000/
+  - url: http://localhost:3000/
+
 paths:
   /reservations:
     get:
       summary: Retrieve a list of reservations
       responses:
         '200':
-          description: OK
+          description: List of reservations retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Reservation'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
     post:
       summary: Create a new reservation
       requestBody:
@@ -28,40 +32,47 @@ paths:
               $ref: '#/components/schemas/CreateReservationDto'
       responses:
         '201':
-          description: Created
+          description: Reservation created successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /reservations/{id}:
     get:
-      summary: Get reservation by ID
+      summary: Retrieve reservation by ID
       parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        description: Unique reservation ID
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique reservation ID
       responses:
         '200':
-          description: OK
+          description: Reservation retrieved successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reservation'
         '404':
-          description: Reservation not found
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
     patch:
       summary: Update reservation by ID
       parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        description: Unique reservation ID
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique reservation ID
       requestBody:
         description: Updated reservation object
         required: true
@@ -71,23 +82,34 @@ paths:
               $ref: '#/components/schemas/UpdateReservationDto'
       responses:
         '200':
-          description: Updated successfully
+          description: Reservation updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
     delete:
       summary: Delete reservation by ID
       parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        description: Unique reservation ID
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique reservation ID
       responses:
         '204':
-          description: Deleted successfully
+          description: Reservation deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
 components:
   schemas:
@@ -100,7 +122,7 @@ components:
         timestamp:
           type: string
           format: date-time
-          description: Timestamp of the reservation
+          description: Timestamp of the reservation creation
         startDate:
           type: string
           format: date-time
@@ -121,6 +143,11 @@ components:
 
     CreateReservationDto:
       type: object
+      required:
+        - startDate
+        - endDate
+        - placeId
+        - invoiceId
       properties:
         startDate:
           type: string
@@ -154,3 +181,57 @@ components:
         invoiceId:
           type: string
           description: Invoice ID for the reservation
+
+  responses:
+    BadRequest:
+      description: Bad request due to invalid or missing parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                example: 400
+              error:
+                type: string
+                example: Bad Request
+              message:
+                type: array
+                items:
+                  type: string
+                  example: "startDate must be a Date instance"
+
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                example: 404
+              error:
+                type: string
+                example: Not Found
+              message:
+                type: string
+                example: "Reservation not found"
+
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                example: 500
+              error:
+                type: string
+                example: Internal Server Error
+              message:
+                type: string
+                example: "An unexpected error occurred"

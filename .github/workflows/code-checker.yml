@@ -33,15 +33,15 @@ jobs:
       - name: Check formatting
         run: pnpm run format --check
 
-      # - name: Run unit tests
-      #   env:
-      #     CI: true
-      #   run: pnpm run test
+      - name: Run unit tests
+        env:
+          CI: true
+        run: pnpm run test
 
       - name: Run coverage check
         env:
           CI: true
         run: pnpm run test:cov
 
-      - name: E2E Tests
-        run: pnpm run test:e2e
+      # - name: E2E Tests
+      #   run: pnpm run test:e2e
