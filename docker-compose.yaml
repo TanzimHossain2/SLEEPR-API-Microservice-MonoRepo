@@ -10,6 +10,8 @@ services:
       - /usr/src/app/node_modules
     environment:
       NODE_ENV: development
+    env_file:
+      - ./apps/reservations/.env
     command: pnpm run start:dev reservations
 
   auth:
@@ -23,6 +25,8 @@ services:
       - /usr/src/app/node_modules # This is to avoid the node_modules folder being overwritten by the volume
     environment:
       NODE_ENV: development
+    env_file:
+      - ./apps/auth/.env
     command: pnpm run start:dev auth
 
   mongo:

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ReservationsModule } from './reservations.module';
 
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import { Logger } from 'nestjs-pino';
 import * as path from 'path';
@@ -22,6 +23,8 @@ async function bootstrap() {
   // Serve Swagger UI at /api-docs
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-  await app.listen(process.env.port ?? 3000);
+  const configService = app.get(ConfigService);
+
+  await app.listen(configService.get('PORT') ?? 3000);
 }
 bootstrap();

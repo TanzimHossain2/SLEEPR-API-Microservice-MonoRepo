@@ -1,35 +1,32 @@
-# Development stage
-FROM node:23-alpine AS development
+FROM node:alpine As development
 
-# Set the working directory
 WORKDIR /usr/src/app
 
-# Copy package.json, pnpm-lock.yaml, and install pnpm
-COPY package*.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+COPY package.json ./
+COPY pnpm-lock.yaml ./
 
-# Copy the rest of the application code
+RUN npm install -g pnpm
+
+RUN pnpm install
+
 COPY . .
 
-# Run the build command
 RUN pnpm run build
 
-# Production stage
-FROM node:23-alpine AS production
+FROM node:alpine as production
 
-# Set production environment
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-# Set the working directory
 WORKDIR /usr/src/app
 
-# Copy production dependencies only
-COPY package*.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --prod --frozen-lockfile
+COPY package.json ./
+COPY pnpm-lock.yaml ./
 
-# Copy the built app from the development stage
+RUN npm install -g pnpm
+
+RUN pnpm install --prod
+
 COPY --from=development /usr/src/app/dist ./dist
 
-# Run the application
 CMD ["node", "dist/apps/reservations/main"]
