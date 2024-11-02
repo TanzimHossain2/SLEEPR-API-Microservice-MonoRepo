@@ -2,10 +2,7 @@ services:
   reservations:
     build:
       context: .
-      dockerfile: ./apps/reservations/Dockerfile
-      target: development
-    # command: sh -c "pnpm install && pnpm run start:dev"
-    command: pnpm run start:dev
+      dockerfile: ./apps/reservations/Dockerfile.dev
     ports:
       - '3000:3000'
     volumes:
@@ -13,8 +10,22 @@ services:
       - /usr/src/app/node_modules
     environment:
       NODE_ENV: development
+    command: pnpm run start:dev reservations
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile.dev
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules # This is to avoid the node_modules folder being overwritten by the volume
+    environment:
+      NODE_ENV: development
+    command: pnpm run start:dev auth
 
   mongo:
     image: mongo:latest
     ports:
-      - '27017:27017'
+      - '27018:27017'

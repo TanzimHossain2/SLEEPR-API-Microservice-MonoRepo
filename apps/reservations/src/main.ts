@@ -9,10 +9,11 @@ import * as swaggerUi from 'swagger-ui-express';
 import * as yaml from 'yaml';
 
 async function bootstrap() {
+  console.log('Starting Reservations service...');
+
   const app = await NestFactory.create(ReservationsModule);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useLogger(app.get(Logger));
-  console.log('test');
 
   const swaggerFilePath = path.resolve(__dirname, '../../../swagger.yaml');
   const swaggerFile = fs.readFileSync(swaggerFilePath, 'utf8');

@@ -32,4 +32,4 @@ RUN npm install -g pnpm && pnpm install --prod --frozen-lockfile
 COPY --from=development /usr/src/app/dist ./dist
 
 # Run the application
-CMD ["node", "dist/apps/reservations/main"]
+CMD ["node", "dist/apps/auth/main"]
