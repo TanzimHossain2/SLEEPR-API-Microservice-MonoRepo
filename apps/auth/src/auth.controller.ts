@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { CurrentUser } from '@app/common';
+import { Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { CurrentUser } from './decorator/current-user.decorator';
+import { JwtAuthGuard } from './guards/jaw-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserDocument } from './users/models/user.schema';
 
@@ -20,8 +22,22 @@ export class AuthController {
     res.send(user);
   }
 
-  @Get()
-  getHello(): string {
-    return this.authService.getHello();
+  @UseGuards(JwtAuthGuard)
+  @MessagePattern('authenticate')
+  async authenticate(@Payload() data: any) {
+    try {
+      if (!data || !data.user) {
+        throw new Error('No user data found in payload');
+      }
+
+      return data.user;
+    } catch (err) {
+      console.error('Error in AuthController authenticate:', err);
+      return {
+        status: 'error',
+        message: 'Authentication process failed',
+        details: err.message,
+      };
+    }
   }
 }

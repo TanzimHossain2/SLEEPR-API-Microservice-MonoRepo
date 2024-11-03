@@ -14,20 +14,33 @@ export class UsersService {
   constructor(private usersRepository: UsersRepository) {}
 
   async create(createUserDto: CreateUserDto) {
-    await this.validateCreateUserDto(createUserDto);
+    const userExists = await this.validateCreateUserDto(createUserDto);
+    if (userExists) {
+      throw new UnprocessableEntityException('Email already exists.');
+    }
+
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
     return this.usersRepository.create({
       ...createUserDto,
-      password: await bcrypt.hash(createUserDto.password, 10),
+      password: hashedPassword,
     });
   }
 
-  async validateCreateUserDto(createUserDto: CreateUserDto) {
-    const user = await this.usersRepository.findOne({
-      email: createUserDto.email,
-    });
+  private async validateCreateUserDto(
+    createUserDto: CreateUserDto,
+  ): Promise<boolean> {
+    try {
+      const user = await this.usersRepository.findOne({
+        email: createUserDto.email,
+      });
 
-    if (user) {
-      throw new UnprocessableEntityException('User already exists');
+      return !!user;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return false;
+      }
+      return false;
     }
   }
 

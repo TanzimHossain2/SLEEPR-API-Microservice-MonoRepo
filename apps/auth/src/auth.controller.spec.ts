@@ -1,22 +1,68 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Response } from 'express';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { UserDocument } from './users/models/user.schema';
 
 describe('AuthController', () => {
   let authController: AuthController;
+  let authService: AuthService;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: {
+            login: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    authController = app.get<AuthController>(AuthController);
+    authController = module.get<AuthController>(AuthController);
+    authService = module.get<AuthService>(AuthService);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(authController.getHello()).toBe('Hello World!');
+  // Test case for login method
+  describe('login', () => {
+    it('should call AuthService.login with correct parameters and send user in response', async () => {
+      const mockUser: UserDocument = {
+        email: 'test@example.com',
+        password: 'password',
+      } as UserDocument;
+      const mockResponse: Partial<Response> = {
+        send: jest.fn(),
+      };
+
+      await authController.login(mockUser, mockResponse as Response);
+
+      expect(authService.login).toHaveBeenCalledWith(mockUser, mockResponse);
+      expect(mockResponse.send).toHaveBeenCalledWith(mockUser);
+    });
+  });
+
+  // Test case for authenticate method
+  describe('authenticate', () => {
+    it('should return user data when valid payload is provided', async () => {
+      const mockData = { user: { email: 'user@example.com' } };
+
+      const result = await authController.authenticate(mockData);
+
+      expect(result).toBe(mockData.user);
+    });
+
+    it('should return error details when no user data is provided', async () => {
+      const mockData = null;
+
+      const result = await authController.authenticate(mockData);
+
+      expect(result).toEqual({
+        status: 'error',
+        message: 'Authentication process failed',
+        details: 'No user data found in payload',
+      });
     });
   });
 });

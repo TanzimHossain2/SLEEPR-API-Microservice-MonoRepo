@@ -22,7 +22,7 @@ services:
       - '3001:3001'
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules # This is to avoid the node_modules folder being overwritten by the volume
+      - /usr/src/app/node_modules 
     environment:
       NODE_ENV: development
     env_file:
