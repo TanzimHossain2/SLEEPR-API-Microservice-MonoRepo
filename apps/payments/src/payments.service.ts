@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { CreateChargeDto } from '@app/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { CreateChargeDto } from './dto/create-charge-dto';
 
 @Injectable()
 export class PaymentsService {
@@ -14,19 +14,33 @@ export class PaymentsService {
   );
 
   async createCharge({ card, amount }: CreateChargeDto) {
-    const paymentMethod = await this.stripe.paymentMethods.create({
-      type: 'card',
-      card,
-    });
+    try {
+      console.log('Creating charge 🔥', card, amount);
 
-    const paymentIntent = await this.stripe.paymentIntents.create({
-      payment_method: paymentMethod.id,
-      amount: amount * 100,
-      confirm: true,
-      payment_method_types: ['card'],
-      currency: 'usd',
-    });
+      // // Step 1: Create a payment method without the token property
+      // const paymentMethod = await this.stripe.paymentMethods.create({
+      //   type: 'card',
+      //   card: {
+      //     number: card.number,
+      //     exp_month: card.exp_month,
+      //     exp_year: card.exp_year,
+      //     cvc: card.cvc,
+      //   },
+      // });
 
-    return paymentIntent;
+      // Step 2: Create a payment intent using the created payment method
+      const paymentIntent = await this.stripe.paymentIntents.create({
+        payment_method: 'pm_card_visa',
+        amount: amount * 100,
+        currency: 'usd',
+        confirm: true,
+        payment_method_types: ['card'],
+      });
+
+      return paymentIntent;
+    } catch (error) {
+      console.error('Error creating charge ❌', error);
+      throw new InternalServerErrorException('Failed to create charge');
+    }
   }
 }

@@ -33,7 +33,7 @@ export class JwtAuthGuard implements CanActivate {
         }),
         map(() => true),
         catchError((err) => {
-          console.error('\nError in authentication:', err);
+          console.error('\nError in authentication ⛔:', err);
           return of(false);
         }),
       );

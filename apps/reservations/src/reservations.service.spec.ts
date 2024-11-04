@@ -1,10 +1,10 @@
-import { AUTH_SERVICE } from '@app/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreateReservationDto } from './dto/create-reservation.dto';
-import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationsRepository } from './reservations.repositary';
 import { ReservationsService } from './reservations.service';
+import { AUTH_SERVICE } from '@app/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { CreateReservationDto } from './dto/create-reservation.dto';
+import { UpdateReservationDto } from './dto/update-reservation.dto';
 
 describe('ReservationsService', () => {
   let service: ReservationsService;
@@ -57,11 +57,7 @@ describe('ReservationsService', () => {
       };
       const userId = 'user-id';
 
-      const expectedResponse = {
-        ...createReservationDto,
-        userId,
-        timestamp: new Date(),
-      };
+      const expectedResponse = { ...createReservationDto, userId, timestamp: new Date() };
       mockReservationsRepository.create.mockResolvedValue(expectedResponse);
 
       const result = await service.create(createReservationDto, userId);
@@ -90,10 +86,7 @@ describe('ReservationsService', () => {
   describe('findOne', () => {
     it('should return a reservation by id', async () => {
       const reservationId = '1';
-      const expectedReservation = {
-        id: reservationId,
-        placeId: 'some-place-id',
-      };
+      const expectedReservation = { id: reservationId, placeId: 'some-place-id' };
       mockReservationsRepository.findOne.mockResolvedValue(expectedReservation);
 
       const result = await service.findOne(reservationId);
@@ -121,9 +114,7 @@ describe('ReservationsService', () => {
         endDate: new Date(),
       };
       const expectedResponse = { id: reservationId, ...updateReservationDto };
-      mockReservationsRepository.findOneAndUpdate.mockResolvedValue(
-        expectedResponse,
-      );
+      mockReservationsRepository.findOneAndUpdate.mockResolvedValue(expectedResponse);
 
       const result = await service.update(reservationId, updateReservationDto);
 
@@ -156,15 +147,11 @@ describe('ReservationsService', () => {
     it('should remove a reservation by id', async () => {
       const reservationId = '1';
       const expectedResponse = { deleted: true };
-      mockReservationsRepository.findOneAndDelete.mockResolvedValue(
-        expectedResponse,
-      );
+      mockReservationsRepository.findOneAndDelete.mockResolvedValue(expectedResponse);
 
       const result = await service.remove(reservationId);
 
-      expect(repository.findOneAndDelete).toHaveBeenCalledWith({
-        _id: reservationId,
-      });
+      expect(repository.findOneAndDelete).toHaveBeenCalledWith({ _id: reservationId });
       expect(result).toEqual(expectedResponse);
     });
 
@@ -174,9 +161,7 @@ describe('ReservationsService', () => {
 
       const result = await service.remove(reservationId);
 
-      expect(repository.findOneAndDelete).toHaveBeenCalledWith({
-        _id: reservationId,
-      });
+      expect(repository.findOneAndDelete).toHaveBeenCalledWith({ _id: reservationId });
       expect(result).toBeNull();
     });
   });

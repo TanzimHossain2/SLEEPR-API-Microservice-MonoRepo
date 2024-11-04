@@ -38,7 +38,7 @@ describe('ReservationsController', () => {
         },
         {
           provide: 'auth',
-          useValue: {},
+          useValue: {}, 
         },
       ],
     }).compile();

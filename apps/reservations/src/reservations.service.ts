@@ -1,6 +1,7 @@
-import { AUTH_SERVICE } from '@app/common';
-import { Inject, Injectable } from '@nestjs/common';
+import { AUTH_SERVICE, PAYMENTS_PATTERN, PAYMENTS_SERVICE } from '@app/common';
+import { Inject, Injectable, NotAcceptableException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { map } from 'rxjs';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationsRepository } from './reservations.repositary';
@@ -10,25 +11,37 @@ export class ReservationsService {
   constructor(
     private readonly reservationsRepository: ReservationsRepository,
     @Inject(AUTH_SERVICE) private readonly authClient: ClientProxy,
+    @Inject(PAYMENTS_SERVICE) private readonly paymentService: ClientProxy,
   ) {}
 
-  create(createReservationDto: CreateReservationDto, userId: string) {
-    return this.reservationsRepository.create({
-      ...createReservationDto,
-      timestamp: new Date(),
-      userId: userId,
-    });
+  async create(createReservationDto: CreateReservationDto, userId: string) {
+    return this.paymentService
+      .send(PAYMENTS_PATTERN.CREATE, createReservationDto.charge)
+      .pipe(
+        map(async (res) => {
+          if (!res) {
+            throw new NotAcceptableException('Payment failed');
+          }
+
+          return this.reservationsRepository.create({
+            ...createReservationDto,
+            timestamp: new Date(),
+            userId: userId,
+            invoiceId: res.id,
+          });
+        }),
+      );
   }
 
-  findAll() {
+  async findAll() {
     return this.reservationsRepository.find({});
   }
 
-  findOne(_id: string) {
+  async findOne(_id: string) {
     return this.reservationsRepository.findOne({ _id });
   }
 
-  update(_id: string, updateReservationDto: UpdateReservationDto) {
+  async update(_id: string, updateReservationDto: UpdateReservationDto) {
     return this.reservationsRepository.findOneAndUpdate(
       { _id },
       {
@@ -37,7 +50,7 @@ export class ReservationsService {
     );
   }
 
-  remove(_id: string) {
+  async remove(_id: string) {
     return this.reservationsRepository.findOneAndDelete({ _id });
   }
 
