@@ -29,6 +29,21 @@ services:
       - ./apps/auth/.env
     command: pnpm run start:dev auth
 
+  payments:
+    build:
+      context: .
+      dockerfile: ./apps/payments/Dockerfile.dev
+    ports:
+      - '3003:3003'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules 
+    environment:
+      NODE_ENV: development
+    env_file:
+      - ./apps/payments/.env
+    command: pnpm run start:dev payments
+
   mongo:
     image: mongo:latest
     ports:

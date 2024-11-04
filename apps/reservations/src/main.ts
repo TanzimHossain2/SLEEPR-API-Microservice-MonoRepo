@@ -16,7 +16,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useLogger(app.get(Logger));
 
-  const swaggerFilePath = path.resolve(__dirname, '../../../swagger.yaml');
+  const swaggerFilePath = path.resolve(
+    __dirname,
+    '../../../docs/swagger/reservations.yaml',
+  );
   const swaggerFile = fs.readFileSync(swaggerFilePath, 'utf8');
   const swaggerDocument = yaml.parse(swaggerFile);
 
@@ -25,7 +28,6 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
- 
   await app.listen(configService.get('PORT') ?? 3000);
 }
 bootstrap();

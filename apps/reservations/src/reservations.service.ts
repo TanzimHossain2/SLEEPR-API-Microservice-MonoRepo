@@ -13,8 +13,6 @@ export class ReservationsService {
   ) {}
 
   create(createReservationDto: CreateReservationDto, userId: string) {
-   
-
     return this.reservationsRepository.create({
       ...createReservationDto,
       timestamp: new Date(),

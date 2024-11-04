@@ -1,0 +1,435 @@
+{
+	"info": {
+		"_postman_id": "15708e1d-6232-431d-8a73-5f205212e3e9",
+		"name": "Users",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26596315",
+		"_collection_link": "https://cloudy-eclipse-51657.postman.co/workspace/SLEEPR-API-Microservice-Monorep~80f28be4-367a-4abe-88a0-ab67314636be/collection/26596315-15708e1d-6232-431d-8a73-5f205212e3e9?action=share&source=collection_link&creator=26596315"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseData = pm.response.json();\r",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};\r",
+							"\r",
+							"if (pm.response.code===201){\r",
+							"    pm.environment.set(\"email\",requestBody.email)\r",
+							"    pm.collectionVariables.set(\"password\",requestBody.password)\r",
+							"}\r",
+							"\r",
+							"// Optionally, store the returned user ID for future use\r",
+							"pm.environment.set(\"user_id\", responseData._id);\r",
+							"\r",
+							"\r",
+							"// Check if the response status is 201 Created\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Email in response matches the sent email\", function () {\r",
+							"  pm.expect(responseData.email).to.equal(pm.environment.get(\"email\"));\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Password in response is hashed\", function () {\r",
+							"  pm.expect(responseData.password).to.not.equal(pm.environment.get(\"password\"));\r",
+							"  pm.expect(responseData.password).to.match(/^\\$2[aby]\\$.{56}$/); // Matches bcrypt hash format\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"email\": \"{{$randomEmail}}\",\r\n        \"password\": \"xxxxx\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "400 Missing",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "298"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"12a-ppzdj3bRXPASVzemA0ORnYFu2A4\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 02 Nov 2024 05:46:11 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": [\n        \"email must be longer than or equal to 4 characters\",\n        \"email should not be empty\",\n        \"email must be an email\",\n        \"email must be a string\",\n        \"password must be longer than or equal to 4 characters\",\n        \"password should not be empty\",\n        \"password must be a string\"\n    ],\n    \"error\": \"Bad Request\",\n    \"statusCode\": 400\n}"
+				},
+				{
+					"name": "201 Account Create",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"email\": \"{{$randomEmail}}\",\r\n        \"password\": \"1233\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "142"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"8e-vubqEasLEL7vCTqp0WGzu2SHgF8\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 02 Nov 2024 14:23:26 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_id\": \"672635de3c9f656f26032566\",\n    \"email\": \"Brown_Leffler@gmail.com\",\n    \"password\": \"$2a$10$FypongAtDB4zKla7eC5uo.IKeIWNfNXeupzuhCs0fseyvd/Rq5hGy\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"it shuld respond valid code\", () => {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 400,401, 404,500])\r",
+							"})\r",
+							"\r",
+							"pm.response.code === 401 && pm.test(\"it should response 'Document not found!' message if user send wrong email\", () => {\r",
+							"    pm.expect(response.message).to.be.a(\"string\"),\r",
+							"        pm.expect(response.message).to.be.equal(\"Document not found\")\r",
+							"    pm.expect(response).to.be.have.property(\"message\")\r",
+							"})\r",
+							"\r",
+							"pm.response.code ===500 && pm.test(\"it should response 500 status code if there internal server error\",()=>{\r",
+							"        pm.expect(response.message).to.be.a(\"string\"),\r",
+							"        pm.expect(response.message).to.be.equal(\"Internal Server Error\")\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "201 Login",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"Gabriella.Balistreri77@hotmail.com\",\r\n       \"password\": \"1233\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "Authentication=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzI2Mzg5NjNjOWY2NTZmMjYwMzI1NjgiLCJpYXQiOjE3MzA1NTgxMjMsImV4cCI6MTczMDU1ODEyNn0.5ctaL3yjxiFya1Yvn6UyB18ElD9m6EWU-OvULtNRQFY; Path=/; Expires=Tue, 05 Nov 2024 07:28:20 GMT; HttpOnly"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "153"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"99-2ZaPYFkailZofUkZVj9ak25izY0\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 02 Nov 2024 14:35:23 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_id\": \"672638963c9f656f26032568\",\n    \"email\": \"Gabriella.Balistreri77@hotmail.com\",\n    \"password\": \"$2a$10$azuYS1rd.4rp2HidxriGJOKPTf7ECtGFiOYHODsI8fx6qMqLyQWBG\"\n}"
+				},
+				{
+					"name": "401 Unauthorized",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"Gabriella.Bazlistreri77@hotmail.com\",\r\n       \"password\": \"1233\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "72"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"48-lUvTEIlVBE14bJj+muvrMi69Aqk\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 02 Nov 2024 14:37:18 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Document not found\",\n    \"error\": \"Unauthorized\",\n    \"statusCode\": 401\n}"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "password",
+			"value": ""
+		}
+	]
+}
