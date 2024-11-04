@@ -51,6 +51,7 @@ export class PaymentsService {
       // Step 3: Send a notification to the notification service
       this.notificationClient.emit(NOTIFICATIONS_PATTERN.NOTIFY_EMAIL, {
         email,
+        text: `You have successfully paid $${amount} 🎉`,
       });
 
       return paymentIntent;
