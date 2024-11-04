@@ -1,0 +1,21 @@
+# Development stage for the reservations service
+FROM node:23-alpine AS development
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Copy only package.json and pnpm-lock.yaml for installing dependencies first
+COPY package*.json pnpm-lock.yaml ./
+
+# Install pnpm globally and install dependencies
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose port (optional)
+EXPOSE 3000
+
+# Default command for development
+CMD ["pnpm", "run", "start:dev", "reservations"]
+

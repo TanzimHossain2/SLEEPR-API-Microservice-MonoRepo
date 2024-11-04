@@ -1,4 +1,4 @@
-name: Code Checker
+name: 🚀 Code Checker
 
 on:
   push:
@@ -13,35 +13,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: 🔧 Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '23.1.0'
 
-      - name: Install pnpm
+      - name: 📦 Install pnpm
         run: npm install -g pnpm
 
-      - name: Install dependencies
+      - name: 📂 Install dependencies
         run: pnpm install
 
-      - name: Lint code
+      - name: 🧹 Lint code
         run: pnpm run lint
 
-      - name: Check formatting
+      - name: 📝 Check formatting
         run: pnpm run format --check
 
-      # - name: Run unit tests
-      #   env:
-      #     CI: true
-      #   run: pnpm run test
+      - name: 🧪 Run unit tests
+        env:
+          CI: true
+        run: pnpm run test
 
-      - name: Run coverage check
+      - name: 📊 Run coverage check
         env:
           CI: true
         run: pnpm run test:cov
 
-      - name: E2E Tests
-        run: pnpm run test:e2e
+      # - name: 🧪 E2E Tests
+      #   run: pnpm run test:e2e

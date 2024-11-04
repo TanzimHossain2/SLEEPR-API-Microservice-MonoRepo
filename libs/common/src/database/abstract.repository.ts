@@ -1,4 +1,8 @@
-import { Logger, NotFoundException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
 import { AbstractDocument } from './abstract.schema';
 
@@ -53,6 +57,22 @@ export abstract class AbstractRepository<T extends AbstractDocument> {
   }
 
   async findOneAndDelete(filterQuery: FilterQuery<T>): Promise<T> {
-    return await this.model.findOneAndDelete(filterQuery).lean<T>(true);
+    try {
+      const document = await this.model
+        .findOneAndDelete(filterQuery)
+        .lean<T>(true);
+
+      if (!document) {
+        this.logger.warn(
+          `Document not found for deletion with filter: ${JSON.stringify(filterQuery)}`,
+        );
+        throw new NotFoundException('Reservation not found');
+      }
+
+      return document as T;
+    } catch (error) {
+      this.logger.error('Error occurred while deleting document', error);
+      throw new InternalServerErrorException('An unexpected error occurred');
+    }
   }
 }
