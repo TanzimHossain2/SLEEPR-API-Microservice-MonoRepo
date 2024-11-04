@@ -1,22 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotifyEmailDto } from './dto/notify-email.dto';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsService } from './notifications.service';
 
 describe('NotificationsController', () => {
   let notificationsController: NotificationsController;
+  let notificationsService: NotificationsService;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [NotificationsController],
-      providers: [NotificationsService],
+      providers: [
+        {
+          provide: NotificationsService,
+          useValue: {
+            notifyEmail: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    notificationsController = app.get<NotificationsController>(NotificationsController);
+    notificationsController = module.get<NotificationsController>(
+      NotificationsController,
+    );
+    notificationsService =
+      module.get<NotificationsService>(NotificationsService);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(notificationsController.getHello()).toBe('Hello World!');
+  describe('notifyEmail', () => {
+    it('should call NotificationsService.notifyEmail with correct data', async () => {
+      const dto: NotifyEmailDto = { email: 'test@example.com', text: 'Hello!' };
+      await notificationsController.notifyEmail(dto);
+
+      expect(notificationsService.notifyEmail).toHaveBeenCalledWith(dto);
     });
   });
 });

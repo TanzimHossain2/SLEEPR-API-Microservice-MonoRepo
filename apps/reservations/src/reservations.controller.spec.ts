@@ -1,5 +1,4 @@
 import { JwtAuthGuard, UserDto } from '@app/common';
-import { APP_GUARD } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -26,22 +25,11 @@ describe('ReservationsController', () => {
           provide: ReservationsService,
           useValue: mockReservationsService,
         },
-        {
-          provide: APP_GUARD,
-          useClass: JwtAuthGuard, // Use JwtAuthGuard for testing
-        },
-        {
-          provide: JwtAuthGuard,
-          useValue: {
-            canActivate: jest.fn(() => true), // Mocking canActivate method
-          },
-        },
-        {
-          provide: 'auth',
-          useValue: {}, 
-        },
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: jest.fn(() => true) }) // Mock JwtAuthGuard
+      .compile();
 
     controller = module.get<ReservationsController>(ReservationsController);
     service = module.get<ReservationsService>(ReservationsService);
@@ -52,27 +40,32 @@ describe('ReservationsController', () => {
   });
 
   describe('create', () => {
-    it('should call create method of ReservationsService', async () => {
+    it('should call create method of ReservationsService with correct arguments', async () => {
       const createReservationDto: CreateReservationDto = {
         startDate: new Date(),
         endDate: new Date(),
-        placeId: 'some-place-id',
-        invoiceId: 'some-invoice-id',
+        charge: {
+          card: {
+            number: '4242424242424242',
+            exp_month: 12,
+            exp_year: 2024,
+            cvc: '123',
+          },
+          amount: 1000,
+        },
       };
+
       const user: UserDto = {
         _id: 'user-id',
         email: 'user@example.com',
-        password: 'user-password',
+        password: 'password',
       };
 
       mockReservationsService.create.mockResolvedValue(createReservationDto);
 
       const result = await controller.create(createReservationDto, user);
 
-      expect(service.create).toHaveBeenCalledWith(
-        createReservationDto,
-        user._id,
-      );
+      expect(service.create).toHaveBeenCalledWith(createReservationDto, user);
       expect(result).toEqual(createReservationDto);
     });
   });

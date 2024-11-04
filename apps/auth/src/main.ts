@@ -10,7 +10,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   const configService = app.get(ConfigService);
 
-
   app.connectMicroservice({
     transport: Transport.TCP,
     options: {
@@ -21,6 +20,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useLogger(app.get(Logger));
+  app.enableCors();
 
   await app.startAllMicroservices();
   await app.listen(configService.get('HTTP_PORT') ?? 3001);

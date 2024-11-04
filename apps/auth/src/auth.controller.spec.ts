@@ -32,14 +32,23 @@ describe('AuthController', () => {
         email: 'test@example.com',
         password: 'password',
       } as UserDocument;
+
+      const mockToken = 'mocked.jwt.token'; // Mock the JWT token
       const mockResponse: Partial<Response> = {
         send: jest.fn(),
       };
 
+      // Mock the return value of the AuthService.login method
+      jest.spyOn(authService, 'login').mockResolvedValue(mockToken);
+
       await authController.login(mockUser, mockResponse as Response);
 
       expect(authService.login).toHaveBeenCalledWith(mockUser, mockResponse);
-      expect(mockResponse.send).toHaveBeenCalledWith(mockUser);
+      expect(mockResponse.send).toHaveBeenCalledWith({
+        status: 'success',
+        message: 'User authenticated',
+        data: { user: mockUser, token: mockToken },
+      });
     });
   });
 

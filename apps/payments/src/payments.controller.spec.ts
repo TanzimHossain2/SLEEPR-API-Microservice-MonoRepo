@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { PaymentCreateChargeDto } from './dto/payment-create-charge.dto';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
-import { CreateChargeDto } from '@app/common';
 
 describe('PaymentsController', () => {
   let paymentsController: PaymentsController;
@@ -23,7 +23,8 @@ describe('PaymentsController', () => {
 
   describe('createCharge', () => {
     it('should call createCharge in PaymentsService with correct data', async () => {
-      const chargeData: CreateChargeDto = {
+      const chargeData: PaymentCreateChargeDto = {
+        email: 'test@example.com',
         card: {
           number: '4242424242424242',
           exp_month: 12,
@@ -38,7 +39,8 @@ describe('PaymentsController', () => {
     });
 
     it('should handle errors and log them', async () => {
-      const chargeData: CreateChargeDto = {
+      const chargeData: PaymentCreateChargeDto = {
+        email: 'test@example.com',
         card: {
           number: '4000000000000002', // Test card number that triggers a decline
           exp_month: 12,
@@ -52,10 +54,27 @@ describe('PaymentsController', () => {
         .spyOn(paymentsService, 'createCharge')
         .mockRejectedValueOnce(new Error('Charge failed'));
 
+      await expect(paymentsController.createCharge(chargeData)).rejects.toThrow(
+        'Charge failed',
+      );
+    });
+
+    it('should throw validation errors for invalid email', async () => {
+      const invalidChargeData: PaymentCreateChargeDto = {
+        email: 'invalid-email',
+        card: {
+          number: '4242424242424242',
+          exp_month: 12,
+          exp_year: 2024,
+          cvc: '123',
+        },
+        amount: 5000,
+      };
+
       try {
-        await paymentsController.createCharge(chargeData);
+        await paymentsController.createCharge(invalidChargeData);
       } catch (error) {
-        expect(error.message).toBe('Charge failed');
+        expect(error.getResponse().message).toContain('email must be an email');
       }
     });
   });

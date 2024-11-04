@@ -1,9 +1,11 @@
 openapi: '3.0.3'
 info:
   title: Reservations API
-  version: '1.0'
+  version: '1.2'  # Updated version
+
 servers:
-  - url: http://localhost:3000/
+  - url: http://localhost:3000/  # Reservations service
+  - url: http://localhost:3001/  # Authentication service
 
 paths:
   /reservations:
@@ -23,6 +25,8 @@ paths:
 
     post:
       summary: Create a new reservation
+      security:
+        - bearerAuth: []  # Require authentication
       requestBody:
         description: Reservation object to create
         required: true
@@ -39,6 +43,8 @@ paths:
                 $ref: '#/components/schemas/Reservation'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'  # Added Forbidden response
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -111,6 +117,80 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /users/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        description: User object to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDto'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User registered successfully"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/login:
+    post:
+      summary: Login a user
+      requestBody:
+        description: User credentials to log in
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "User authenticated"
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                            example: "6728c95681ddd30cdeba4952"
+                          email:
+                            type: string
+                            example: "kdptanzim0@gmail.com"
+                          password:
+                            type: string
+                            example: "$2a$10$3L.i2nuin7TYVXewSFcDnejV2EgsWsk8JMSFvCeOlMxpHBG4AvnFO"
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   schemas:
     Reservation:
@@ -134,9 +214,6 @@ components:
         userId:
           type: string
           description: User ID associated with the reservation
-        placeId:
-          type: string
-          description: Place ID associated with the reservation
         invoiceId:
           type: string
           description: Invoice ID for the reservation
@@ -146,8 +223,7 @@ components:
       required:
         - startDate
         - endDate
-        - placeId
-        - invoiceId
+        - charge
       properties:
         startDate:
           type: string
@@ -157,12 +233,9 @@ components:
           type: string
           format: date-time
           description: End date for the reservation
-        placeId:
-          type: string
-          description: Place ID for the reservation
-        invoiceId:
-          type: string
-          description: Invoice ID for the reservation
+        charge:
+          type: object
+          $ref: '#/components/schemas/CreateChargeDto'  # Referencing charge structure
 
     UpdateReservationDto:
       type: object
@@ -175,12 +248,70 @@ components:
           type: string
           format: date-time
           description: End date for the reservation
-        placeId:
+        charge:
+          type: object
+          $ref: '#/components/schemas/CreateChargeDto'  # Referencing charge structure
+
+    CreateChargeDto:
+      type: object
+      required:
+        - card
+        - amount
+      properties:
+        card:
+          type: object
+          $ref: '#/components/schemas/CardDto'
+        amount:
+          type: number
+          description: Amount to be charged
+
+    CardDto:
+      type: object
+      required:
+        - number
+        - exp_month
+        - exp_year
+      properties:
+        cvc:
           type: string
-          description: Place ID for the reservation
-        invoiceId:
+          description: Card Verification Code
+        exp_month:
+          type: number
+          description: Expiration month of the card
+        exp_year:
+          type: number
+          description: Expiration year of the card
+        number:
           type: string
-          description: Invoice ID for the reservation
+          description: Credit card number
+
+    RegisterDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address for the new user
+        password:
+          type: string
+          description: Password for the new user
+
+    LoginDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address for the user
+        password:
+          type: string
+          description: Password for the user
 
   responses:
     BadRequest:
@@ -219,8 +350,42 @@ components:
                 type: string
                 example: "Reservation not found"
 
+    Forbidden:
+      description: Forbidden resource access due to lack of authentication
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                example: 403
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: "Unauthorized access"
+
+    Unauthorized:
+      description: User authentication failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                example: 401
+              error:
+                type: string
+                example: Unauthorized
+              message:
+                type: string
+                example: "Invalid credentials"
+
     ServerError:
-      description: Internal server error
+      description: Internal server error occurred
       content:
         application/json:
           schema:
@@ -235,3 +400,11 @@ components:
               message:
                 type: string
                 example: "An unexpected error occurred"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+      
