@@ -33,8 +33,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/payments/Dockerfile.dev
-    ports:
-      - '3003:3003'
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules 
@@ -43,6 +41,19 @@ services:
     env_file:
       - ./apps/payments/.env
     command: pnpm run start:dev payments
+
+  notifications:
+    build:
+      context: .
+      dockerfile: ./apps/notifications/Dockerfile.dev
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules 
+    environment:
+      NODE_ENV: development
+    env_file:
+      - ./apps/notifications/.env
+    command: pnpm run start:dev notifications
 
   mongo:
     image: mongo:latest

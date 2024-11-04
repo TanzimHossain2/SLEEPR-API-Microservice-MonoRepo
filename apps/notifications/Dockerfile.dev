@@ -15,4 +15,4 @@ COPY . .
 
 
 # Default command for development
-CMD ["pnpm", "run", "start:dev", "payments"]
+CMD ["pnpm", "run", "start:dev", "notifications"]

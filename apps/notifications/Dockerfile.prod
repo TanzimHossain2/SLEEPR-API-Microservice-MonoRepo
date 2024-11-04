@@ -18,4 +18,4 @@ RUN npm install -g pnpm && pnpm install --prod --frozen-lockfile
 COPY ./dist ./dist
 
 # Run the application
-CMD ["node", "dist/apps/payments/main"]
+CMD ["node", "dist/apps/notifications/main"]
